@@ -1,20 +1,27 @@
-import * as fs from 'fs/promises';
-import { access, constants } from 'node:fs';
+import { access, writeFile } from 'fs/promises';
+import { constants } from 'node:fs';
 export const create = async () => {
+    const file = './files/fresh.txt';
 
-	const file = './files/fresh.txt';
-	async function writeFile(file) {access(file, constants.F_OK, (err) => {
-		if (err) {
-			try {
-		fs.writeFile(file, "I am fresh and young", 'utf8')
-	} catch (error) {
-		console.error('FS operation failed');
-	}
+    const createFile = async (file) => {
+        try {
+            if (!(await checkFileExists(file))) {
+                await writeFile(file, 'I am fresh and young', 'utf8');
+            } else {
+                throw Error('FS operation failed');
+            }
+        } catch (error) {
+            console.error(error.message);
+        }
+    };
 
-		} else {console.error('FS operation failed');}
-	});}
+    const checkFileExists = async (file) => {
+        return await access(file, constants.F_OK)
+            .then(() => true)
+            .catch(() => false);
+    };
 
-	writeFile(file)
-
+    createFile(file);
 };
-create()
+
+create();
